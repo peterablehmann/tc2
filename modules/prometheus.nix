@@ -7,7 +7,7 @@
     scrapeConfigs = [
       {
         job_name = "node-exporter";
-        scrape_interval = "20s";
+        scrape_interval = "10s";
         scheme = "http";
         static_configs = [{
           targets = [
@@ -16,15 +16,32 @@
           ];
         }];
       }
+      {
+        job_name = "fritzbox";
+        scrape_interval = "10s";
+        scheme = "http";
+        static_configs = [{
+          targets = [
+            "127.0.0.1:9133"
+          ];
+        }];
+      }
     ];
-    exporters.node = {
-      enable = true;
-      listenAddress = "192.168.10.11";
-      enabledCollectors = [
-        "systemd"
-        "ethtool"
-      ];
-  };
+    exporters = {
+      node = {
+        enable = true;
+        listenAddress = "192.168.10.11";
+        enabledCollectors = [
+          "systemd"
+          "ethtool"
+        ];
+      };
+      fritzbox = {
+        enable = true;
+        gatewayAddress = "192.168.10.1";
+        listenAddress = "127.0.0.1";
+      };
+    };
   };
 
 
