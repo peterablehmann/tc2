@@ -1,4 +1,12 @@
 {
+  config,
+  inputs,
+  ...
+}:
+{
+  sops.secrets."fritzbox/password" = {
+    sopsFile = "${inputs.self}/secrets/prometheus.yaml";
+  };
   networking.firewall.allowedTCPPorts = [ 9100 ];
   services.prometheus = {
     enable = true;
@@ -40,6 +48,10 @@
         enable = true;
         gatewayAddress = "192.168.10.1";
         listenAddress = "127.0.0.1";
+        extraFlags = [
+          "-username prometheus"
+          "-password $(cat ${config.sops.secrets."fritzbox/password".path})"
+        ];
       };
     };
   };
