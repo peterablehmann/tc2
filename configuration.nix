@@ -1,10 +1,12 @@
-{ modulesPath, lib, inputs, ... }: {
+{ modulesPath, lib, inputs, config, ... }: {
   imports = [
 
     inputs.disko.nixosModules.disko
     ./disko.nix
     ./hardware-configuration.nix
     ./modules
+    ./renovate/package.nix
+    ./renovate/renovate.nix
   ];
 
   nix = {
@@ -38,6 +40,18 @@
       ];
     };
     interfaces.eth0.useDHCP = true;
+  };
+
+  sops.secrets."renovate/environment" = {
+    sopsFile = "${inputs.self}/secrets/renovate.yaml";
+  };
+
+  services.renovate = {
+    enable = true;
+    environmentFiles = [ config.sops.secret."renovate/environment".path ];
+    settings = {
+      repositories = [ "peterablehmann/terraform" ];
+    };
   };
 
   users.users.root = {
