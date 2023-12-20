@@ -31,5 +31,7 @@
         ];
       };
     };
+
+    packages.x86_64-linux.renovate = nixpkgs.legacyPackages.x86_64-linux.callPackage ./renovate/package.nix {};
   };
 }

@@ -2,28 +2,26 @@
 
 let
   cfg = config.services.renovate;
-  settingsFormat = pkgs.format.json { };
+  settingsFormat = pkgs.formats.json { };
   settingsFile = settingsFormat.generate "config.json" cfg.settings;
 in {
-  inherit (pkgs.renovate) meta.maintainers;
-
   options = {
     services.renovate = {
-      enable = mkEnableOption (lib.mdDoc "Renovatebot");
+      enable = lib.mkEnableOption (lib.mdDoc "Renovatebot");
 
       environmentFiles = lib.mkOption {
-        type = lib.types.listOf.path;
+        type = lib.types.listOf lib.types.path;
         default = [ ];
-        example = [ /etc/renovate/environment.env ];
+        example = [ "/etc/renovate/environment.env" ];
         description = lib.mdDoc ''
           Set environment files for renovate.
         '';
       };
 
       path = lib.mkOption {
-        type = lib.types.listOf lib.types.packages;
+        type = lib.types.listOf lib.types.package;
         default = [ ];
-        example = [ "pkgs.poetry" ];
+        # example = [ "pkgs.poetry" ];
         description = lib.mdDoc ''
           Renovate needs access to language specific tooling to perform it's tasks.
         '';
@@ -37,21 +35,37 @@ in {
           See https://docs.renovatebot.com/self-hosted-configuration/ for possible values
         '';
       };
+
+      interval = lib.mkOption {
+        default = "1h";
+        type = lib.types.str;
+        description = lib.mdDoc ''
+          Set the run interval for the renovate service.
+        '';
+      };
     };
   };
 
   config = lib.mkIf cfg.enable {
+    systemd.timers."renovate" = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        OnUnitActiveSec = cfg.interval;
+        Unit = "renovate.service";
+      };
+    };  
+
     systemd.services.renovate = {
       wants = [ "network.target" ];
       after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
       description = "Renovate Service";
-      path = cfg.path;
-      environment = { RENOVATE_CONFIG_FILE = settingsFile };
+      path = lib.concat [ pkgs.git ] cfg.path;
+      environment = { RENOVATE_CONFIG_FILE = settingsFile; };
       serviceConfig = {
         DynamicUser = true;
-        environmentFile = cfg.environmentFiles;
-        ExecStart = "${pkgs.renovate}/bin/renovate";
+        EnvironmentFile = cfg.environmentFiles;
+        ExecStart = "${pkgs.callPackage ./package.nix { }}/bin/renovate";
         Type = "simple";
         Restart = "on-failure";
         RestartSec = 15;

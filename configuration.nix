@@ -5,7 +5,6 @@
     ./disko.nix
     ./hardware-configuration.nix
     ./modules
-    ./renovate/package.nix
     ./renovate/renovate.nix
   ];
 
@@ -48,7 +47,7 @@
 
   services.renovate = {
     enable = true;
-    environmentFiles = [ config.sops.secret."renovate/environment".path ];
+    environmentFiles = [ config.sops.secrets."renovate/environment".path ];
     settings = {
       repositories = [ "peterablehmann/terraform" ];
     };

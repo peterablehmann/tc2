@@ -1,4 +1,4 @@
-{ lib, buildNpmPackage, fetchFromGitHub }:
+{ lib, buildNpmPackage, fetchFromGitHub, python3 }:
 
 buildNpmPackage rec {
   pname = "renovate";
@@ -10,6 +10,10 @@ buildNpmPackage rec {
     rev = version;
     hash = "sha256-Obplx/H8IvoMMTVgVWVGOLfFbMmrNnP4j94T+Qicusw=";
   };
+
+  nativeBuildInputs = [
+    python3
+  ];
 
   npmDepsHash = "sha256-N3cfQpQNcz4s1XH5rVX1QjztWo3ReVjKE9dw2KsO9ws=";
 
