@@ -49,7 +49,12 @@
     enable = true;
     environmentFiles = [ config.sops.secrets."renovate/environment".path ];
     settings = {
-      repositories = [ "peterablehmann/terraform" ];
+      repositories = [
+        "peterablehmann/terraform"
+        "peterablehmann/flake"
+        "peterablehmann/tc1"
+        "peterablehmann/tc2"
+        ];
     };
   };
 
