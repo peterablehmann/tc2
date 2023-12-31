@@ -1,4 +1,4 @@
-{ modulesPath, lib, inputs, config, ... }: {
+{ modulesPath, lib, inputs, config, pkgs, ... }: {
   imports = [
 
     inputs.disko.nixosModules.disko
@@ -48,6 +48,7 @@
   services.renovate = {
     enable = true;
     environmentFiles = [ config.sops.secrets."renovate/environment".path ];
+    path = [ pkgs.nix ];
     settings = {
       repositories = [
         "peterablehmann/terraform"
