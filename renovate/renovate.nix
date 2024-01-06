@@ -63,7 +63,6 @@ in {
       path = lib.concat [ pkgs.git ] cfg.path;
       environment = { RENOVATE_CONFIG_FILE = settingsFile; };
       serviceConfig = {
-        DynamicUser = true;
         EnvironmentFile = cfg.environmentFiles;
         ExecStart = "${pkgs.callPackage ./package.nix { }}/bin/renovate";
         Type = "simple";
